@@ -8,6 +8,7 @@ function build_construct_tree()
     local out=$3
     local in="$4"
 
+    echo "cmd=$1 cmdline=$2 out=$3 in=$4" >> log.tree
     mkdir -p ${BUILD_TREE}/$out
     touch ${BUILD_TREE}/$out/out
     echo $cmd > ${BUILD_TREE}/$out/command

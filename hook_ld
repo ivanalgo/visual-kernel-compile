@@ -7,25 +7,48 @@ outfile=""
 infiles=""
 next_is_outfile=0
 next_is_infile=0
+group_infile=0
     
-    for opt in $@
-    do
+for opt in $@
+do
         if [ $next_is_outfile -eq 1 ]; then
             outfile=$opt
             next_is_outfile=0
-            next_is_infile=1
             continue
         fi
 
         if [ $next_is_infile -eq 1 ]; then
             infiles="$infiles $opt"
+	    next_is_infile=0
             continue
         fi
+
+	if [ $group_infile -eq 1 ]; then
+		infiles="$infiles $opt"
+		continue
+	fi
 
         if [ $opt == '-o' ]; then
             next_is_outfile=1
         fi
+
+	if [ "$opt" == "-T" ]; then
+		next_is_infile=1
+	fi
+
+	if [ "$opt" == "--whole-archive" ]; then
+		next_is_infile=1
+	fi
+
+	if [ "$opt" == "--start-group" ]; then
+		group_infile=1
+	fi
+
+	if [ "$opt" == "--end-group" ]; then
+		group_infile=0
+	fi
     done
 
-    echo "LD $infiles -> $outfile" >> log
-
+echo "$@" >> log.ld
+echo "$infiles -> $outfile" >> log.ld
+build_construct_tree "ld" "$@" "$outfile" "$infiles"
