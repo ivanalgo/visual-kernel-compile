@@ -1,0 +1,7 @@
+#!/bin/bash
+
+
+sleep 1000
+PID=$(ps | grep bash | awk '{print $1}')
+cat /proc/$PID/cmdline >> log.objdump
+echo "$@" >> log.objdump

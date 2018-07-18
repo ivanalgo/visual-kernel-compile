@@ -1,0 +1,31 @@
+#!/bin/bash
+
+path=$(dirname $(realpath $0))
+. $path/tree.sh
+
+outfile=""
+infiles=""
+next_is_outfile=0
+next_is_infile=0
+    
+    for opt in $@
+    do
+        if [ $next_is_outfile -eq 1 ]; then
+            outfile=$opt
+            next_is_outfile=0
+            next_is_infile=1
+            continue
+        fi
+
+        if [ $next_is_infile -eq 1 ]; then
+            infiles="$infiles $opt"
+            continue
+        fi
+
+        if [ $opt == '-o' ]; then
+            next_is_outfile=1
+        fi
+    done
+
+    echo "LD $infiles -> $outfile" >> log
+
