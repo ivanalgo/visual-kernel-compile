@@ -16,6 +16,31 @@ group_infile=0
     
 for opt in $@
 do
+        if [ $opt == '-o' ]; then
+            next_is_outfile=1
+	    continue
+        fi
+
+	if [ "$opt" == "-T" ]; then
+		next_is_infile=1
+		continue
+	fi
+
+	if [ "$opt" == "--whole-archive" ]; then
+		next_is_infile=1
+		continue
+	fi
+
+	if [ "$opt" == "--start-group" ]; then
+		group_infile=1
+		continue
+	fi
+
+	if [ "$opt" == "--end-group" ]; then
+		group_infile=0
+		continue
+	fi
+
         if [ $next_is_outfile -eq 1 ]; then
             outfile=$opt
             next_is_outfile=0
@@ -33,25 +58,6 @@ do
 		continue
 	fi
 
-        if [ $opt == '-o' ]; then
-            next_is_outfile=1
-        fi
-
-	if [ "$opt" == "-T" ]; then
-		next_is_infile=1
-	fi
-
-	if [ "$opt" == "--whole-archive" ]; then
-		next_is_infile=1
-	fi
-
-	if [ "$opt" == "--start-group" ]; then
-		group_infile=1
-	fi
-
-	if [ "$opt" == "--end-group" ]; then
-		group_infile=0
-	fi
     done
 
 echo "$@" >> log.ld

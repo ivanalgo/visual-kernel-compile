@@ -4,4 +4,14 @@ path=$(dirname $(realpath $0))
 . $path/comm-func.sh
 
 cmdline=$(shell_command $$)
-echo "$cmdline" >> log.readlef
+
+# if readelf don't output to a file, it just do some test work
+# will not generate files, just skip it 
+if ! echo "$cmdline" | grep -q ">"; then
+		exit
+fi
+
+# if reach here, readelf will generate some to compile or linker,
+# we need to handle it.
+echo "$cmdline" >> log.readelf
+exit 1
