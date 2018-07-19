@@ -1,0 +1,62 @@
+#!/bin/bash
+
+path=$(dirname $(realpath $0))
+. $path/comm-func.sh
+. $path/tree.sh
+
+cmdline=$(shell_command $$)
+
+# if nm binary without directory to a file, this command's prosual is just to 
+# do some test Job, doesn't generator compile work, so just skip it
+if ! echo "$cmdline" | grep -q ">"; then
+	exit
+fi
+
+#
+# So the affective nm command should like below:
+#
+# nm -n .tmp_vmlinux1  | scripts/kallsyms --absolute-percpu --base-relative  > /root/open_source/linux/.tmp_kallsyms1.S
+# nm vmlinux  | sed -n -e s/^\([0-9a-fA-F]*\) [ABCDGRSTVW] \(_text\|__bss_start\|_end\)$/#define VO_\2 _AC(0x\1,UL)/p  > /root/open_source/linux/arch/x86/boot/voffset.h
+#
+
+# step1: find the nm argument
+args=""
+start_arg=0
+
+for opt in $cmdline
+do
+	if [ "$opt" == "nm" ]; then
+		start_arg=1
+		continue
+	fi
+
+	if [ "$opt" == ">" -o "$opt" == "|" ]; then
+		break;
+	fi
+
+	if [ $start_arg -eq 1 ]; then
+		args="$args $opt"
+	fi
+done
+
+# step2: handle nm's argument
+infiles=""
+
+for arg in $args
+do
+	if [ "$arg" == "-n" ]; then
+		continue
+	fi
+
+	infiles="$infiles $arg"
+done
+
+# step3: output file is the last one
+outfile=""
+for opt in $cmdline
+do
+	outfile=$opt
+done
+
+build_construct_tree "nm" "$cmdline" "$outfile" "$infiles"
+echo "$cmdline" >> log.nm

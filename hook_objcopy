@@ -1,0 +1,33 @@
+#!/bin/bash
+
+path=$(dirname $(realpath $0))
+. $path/comm-func.sh
+. $path/tree.sh
+
+next_is_infile=0
+next_is_outfile=0
+
+infile=""
+outfile=""
+
+for opt in $@
+do
+	if [ $next_is_infile -eq 1 ]; then
+		infile=$opt
+		next_is_infile=0
+		next_is_outfile=1
+	fi
+
+	if [ $next_is_outfile -eq 1 ]; then
+		outfile=$opt
+		next_is_outfile=0
+	fi
+
+	if [ "$opt" == "-S" ]; then
+		next_is_infile=1
+	fi
+done
+
+echo "objcopy $infile -> $outfile" >> log.objcopy
+
+build_construct_tree "objcopy" "$@" "$outfile" "$infile"

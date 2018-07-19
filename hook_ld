@@ -3,6 +3,11 @@
 path=$(dirname $(realpath $0))
 . $path/tree.sh
 
+# if ld command execute with no -o option, it just act as testing, skip it
+if ! echo $@ | grep -q "\-o"; then
+	exit
+fi
+
 outfile=""
 infiles=""
 next_is_outfile=0
