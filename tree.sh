@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/bin/bash -x
 
 BUILD_TREE=.build
 function build_construct_tree()
 {
-    local cmd=$1
+    local cmd="$1"
     local cmdline="$2"
     local out=$3
     local in="$4"

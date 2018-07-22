@@ -60,3 +60,4 @@ done
 
 build_construct_tree "nm" "$cmdline" "$outfile" "$infiles"
 echo "$cmdline" >> log.nm
+echo "$infiles -> $outfile" >> log.nm

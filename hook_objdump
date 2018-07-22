@@ -4,4 +4,38 @@ path=$(dirname $(realpath $0))
 . $path/comm-func.sh
 
 cmdline=$(shell_command $$)
-echo my: $cmdline >> log.objdump
+
+infile=""
+outfile=""
+
+next_is_infile=0
+next_is_outfile=0
+
+for opt in $cmdline
+do
+	if [ $next_is_infile -eq 1 ]; then
+		infile=$opt
+		next_is_infile=0
+		continue
+	fi
+
+	if [ $next_is_outfile -eq 1 ]; then
+		outfile=$opt
+		next_is_outfile=0
+		continue
+	fi
+
+	if [ "$opt" == "-h" ]; then
+		next_is_infile=1
+		continue
+	fi
+
+	if [ "$opt" == ">" ]; then
+		next_is_outfile=1
+	fi
+done
+
+echo "$cmdline" >> log.objdump
+echo "$infile -> $outfile" >> log.objdump
+
+build_construct_tree "objdump" "$cmdline" "$outfile" "$infile"

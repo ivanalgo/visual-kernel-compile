@@ -2,64 +2,38 @@
 
 path=$(dirname $(realpath $0))
 . $path/tree.sh
-
-# if ld command execute with no -o option, it just act as testing, skip it
-if ! echo $@ | grep -q "\-o"; then
-	exit
-fi
+. $path/option.sh
 
 outfile=""
 infiles=""
-next_is_outfile=0
-next_is_infile=0
-group_infile=0
     
-for opt in $@
-do
-        if [ $opt == '-o' ]; then
-            next_is_outfile=1
-	    continue
-        fi
+function add_outfile()
+{
+	outfile=$1
+}
 
-	if [ "$opt" == "-T" ]; then
-		next_is_infile=1
-		continue
-	fi
+function add_infile()
+{
+	infiles="$infiles $1"
+}
 
-	if [ "$opt" == "--whole-archive" ]; then
-		next_is_infile=1
-		continue
-	fi
+declare -a option_tbl0=("-m"			"ARG"		""		"true")
+declare -a option_tbl1=("-z"			"ARG"		""		"true")
+declare -a option_tbl2=("-r"			"NOARG"		""		"true")
+declare -a option_tbl3=("-o"			"ARG" 		""		"add_outfile")
+declare -a option_tbl4=("--whole-archive"	"ARG"		""		"add_infile")
+declare -a option_tbl5=("--no-whole-archive"	"NOARG"		""		"true")
+declare -a option_tbl6=("--start-group"		"PAIR"		"--end-group"	"add_infile")
+declare -a option_tbl7=("--emit-relocs"		"NOARG"		""		"true")
+declare -a option_tbl8=("--build-id"		"NOARG"		""		"true")
+declare -a option_tbl9=("-T"			"ARG"		""		"add_infile")
 
-	if [ "$opt" == "--start-group" ]; then
-		group_infile=1
-		continue
-	fi
+my_getopt "option_tbl" 10 "add_infile" "$*"
 
-	if [ "$opt" == "--end-group" ]; then
-		group_infile=0
-		continue
-	fi
-
-        if [ $next_is_outfile -eq 1 ]; then
-            outfile=$opt
-            next_is_outfile=0
-            continue
-        fi
-
-        if [ $next_is_infile -eq 1 ]; then
-            infiles="$infiles $opt"
-	    next_is_infile=0
-            continue
-        fi
-
-	if [ $group_infile -eq 1 ]; then
-		infiles="$infiles $opt"
-		continue
-	fi
-
-    done
 
 echo "$@" >> log.ld
 echo "$infiles -> $outfile" >> log.ld
-build_construct_tree "ld" "$@" "$outfile" "$infiles"
+if [ -z "$outfile" ]; then
+	exit
+fi
+build_construct_tree "ld" "$*" "$outfile" "$infiles"
