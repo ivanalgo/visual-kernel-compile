@@ -2,6 +2,7 @@
 
 path=$(dirname $(realpath $0))
 . $path/comm-func.sh
+. $path/tree.sh
 
 cmdline=$(shell_command $$)
 

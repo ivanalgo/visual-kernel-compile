@@ -8,28 +8,32 @@ infiles=""
 next_is_outfile=0
 next_is_infile=0
 
-    for opt in $@
-    do
-        if [ $next_is_outfile -eq 1 ]; then
-            outfile=$opt
-            next_is_outfile=0
-            next_is_infile=1
-            continue
-        fi
+i=0
+for opt in $@
+do
+	i=$((i+1))
 
-        if [ $next_is_infile -eq 1 ]; then
-            infiles="$infiles $opt"
-            continue
-        fi
+	if [ $next_is_outfile -eq 1 ]; then
+		outfile=$opt
+		next_is_outfile=0
+		next_is_infile=1
+		continue
+	fi
 
-        if [ $opt == "rcSTPD" ]; then
-            next_is_outfile=1
-        fi
-    done
+	if [ $next_is_infile -eq 1 ]; then
+		infiles="$infiles $opt"
+		continue
+	fi
+
+	if [ $i -eq 2 ]; then
+		next_is_outfile=1
+	fi
+done
 
 if [ -z "${outfile}" -o -z "${infiles}" ]; then
 	exit
 fi
-    echo "ar ${infiles} -> ${outfile}" >> log
-    build_construct_tree "ar" "$*" "${outfile}" "${infiles}"
+echo "$@" >> log.ar
+echo "${infiles} -> ${outfile}" >> log.ar
+build_construct_tree "ar" "$*" "${outfile}" "${infiles}"
 
