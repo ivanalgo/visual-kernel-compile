@@ -4,13 +4,16 @@ path=$(dirname $(realpath $0))
 . $path/tree.sh
 
 result=$($path/adapter_gcc $@)
+if [ $? -ne 0 ]; then
+	exit 1
+fi
 
 infile=$(echo "$result" | awk -F ":" '{print $1}')
 outfile=$(echo "$result" | awk -F ":" '{print $2}')
 
 echo "$@" >> log.gcc
 
-if [ ! -f "$outfile" ];then
+if [ -z "$outfile" -o -z "$infile" -o -b "$outfile" -o "$infile" == "-" ];then
 	exit
 fi
 echo "$infile -> $outfile" >> log.gcc

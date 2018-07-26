@@ -13,11 +13,15 @@ struct opt {
 	int	has_arg;
 	int 	type;	
 } opttbls[] = {
+	/* -Wl.T, must in the front of -W */
+	{"-Wl,-T,",		1,	INPUT},
+	/* wilcard for all -Wxxx */
 	{"-W",			1,	IGNOR},
 	{"-D",			1,	IGNOR},
 	{"-d",			1,	IGNOR},
 	{"-U",			1,	IGNOR},
 	{"-E",			0,	IGNOR},
+	{"-g",			0,	IGNOR},
 	{"-nostdinc",		0,	IGNOR},
 	{"-isystem",		1,	IGNOR},
 	{"-include",		1,	IGNOR},
@@ -38,6 +42,7 @@ struct opt {
 	{"-c",			0,	IGNOR},
 	{"-S",			0,	IGNOR},
 	{"-x",			1,	IGNOR},
+	{"-v",			0,	IGNOR},
 };
 
 #define OPT_SIZE (sizeof(opttbls)/sizeof(opttbls[0]))
@@ -118,6 +123,6 @@ match:
 		}
 	}
 
-	printf("%s : %s\n", input_files, output_files);
+	printf("%s:%s\n", input_files? input_files : "", output_files? output_files : "");
 	return 0;
 }
