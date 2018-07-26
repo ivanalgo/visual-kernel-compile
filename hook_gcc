@@ -3,42 +3,15 @@
 path=$(dirname $(realpath $0))
 . $path/tree.sh
 
-compile=0
-assemble=0
-link=0
-outfile=""
-infile=""
-next_is_outfile=0
+result=$($path/adapter_gcc $@)
 
-for opt in $@
-do
-	last_arg=$opt
+infile=$(echo "$result" | awk -F ":" '{print $1}')
+outfile=$(echo "$result" | awk -F ":" '{print $2}')
 
-	if [ $next_is_outfile -eq 1 ]; then
-		outfile=$opt
-		next_is_outfile=0
-		continue
-	fi
+echo "$@" >> log.gcc
 
-	if [ $opt == "-c" ]; then
-		compile=1
-	elif [ $opt == "-s" ]; then
-		assemble=1
-	elif [ $opt == "-o" ]; then
-		next_is_outfile=1
-	elif [ $opt == "-x" ]; then
-		# gcc -x is to test
-		exit	
-	elif [ $opt == "-v" ]; then
-		# gcc -v is to test
-		exit	
-	fi
-done
-
-if [ $compile -ne 1 -a $assemble -ne 1 ]; then
-	# not compile or assemble command, just skip it
-	exit	
+if [ ! -f "$outfile" ];then
+	exit
 fi
-
-infile=${last_arg}
+echo "$infile -> $outfile" >> log.gcc
 build_construct_tree "gcc" "$*" ${outfile} "${infile}"
