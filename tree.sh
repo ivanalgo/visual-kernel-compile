@@ -1,6 +1,7 @@
 #!/bin/bash
 
-BUILD_TREE=.build
+BUILD_TREE=${PWD}/.build
+MOV_TREE=${BUILD_TREE}/.tmp
 
 function path2id()
 {
@@ -31,6 +32,10 @@ function build_construct_tree()
 
 		if [ -e ${BUILD_TREE}/${ipath} ]; then
 			mv ${BUILD_TREE}/${ipath} ${BUILD_TREE}/${out_path}/
+			mkdir -p ${MOV_TREE}
+			ln -s ${BUILD_TREE}/${out_path}/${ipath} ${MOV_TREE}/${ipath}
+		elif [ -e ${MOV_TREE}/${ipath} ]; then
+			ln -s ${MOV_TREE}/${ipath} ${BUILD_TREE}/${out_path}/${ipath}
 		else
 			mkdir -p ${BUILD_TREE}/${out_path}/${ipath}
 		fi

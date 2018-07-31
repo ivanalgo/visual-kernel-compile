@@ -13,7 +13,7 @@ outfile=$(echo "$result" | awk -F ":" '{print $2}')
 
 echo "$@" >> log.gcc
 
-if [ -z "$outfile" -o -z "$infile" -o -b "$outfile" -o "$infile" == "-" ];then
+if [ -z "$outfile" -o -z "$infile" -o -c "$outfile" -o "$infile" == "-" -o -c "$infile" ];then
 	exit
 fi
 echo "$infile -> $outfile" >> log.gcc
